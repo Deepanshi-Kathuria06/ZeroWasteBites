@@ -1,0 +1,38 @@
+.hero {
+    background: url("../assets/hero.jpg") center/cover;
+    padding: 100px 20px;
+  }
+  
+  .hero h1 {
+    font-size: 40px;
+    font-weight: bold;
+  }
+  
+  .hero-buttons {
+    margin-top: 20px;
+  }
+  
+  .donate-btn, .request-btn {
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    margin: 10px;
+    font-size: 16px;
+  }
+  
+  .donate-btn {
+    background-color: #00ff99;
+    color: black;
+  }
+  
+  .request-btn {
+    background-color: black;
+    color: #00ff99;
+    border: 2px solid #00ff99;
+  }
+  
+  .stats-text {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  

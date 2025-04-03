@@ -1,0 +1,18 @@
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 50px;
+    background: #222;
+  }
+  
+  .stat-box {
+    padding: 20px;
+    background: black;
+    color: #00ff99;
+    border: 2px solid #00ff99;
+    width: 150px;
+    text-align: center;
+    border-radius: 10px;
+  }
+  
