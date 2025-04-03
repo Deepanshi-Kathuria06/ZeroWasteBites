@@ -1,20 +1,16 @@
 import React from "react";
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Stats from "./components/Stats";
-
-import Chatbot from "./components/chatbot";
+import { Routes, Route } from "react-router-dom";
+import LandingPage from "./LandingPage";
+import Join from "./join" // Make sure this matches your component file name
 import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <Navbar />
-      <Hero />
-      <Stats />
-      {/* <About /> */}
-      <Chatbot />
-      
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/join" element={<Join />} /> {/* lowercase 'j' to match the navigation */}
+      </Routes>
     </div>
   );
 }
