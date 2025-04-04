@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import './FoodDonationApp.css';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const FoodDonationApp = () => {
   const [isRequesterView, setIsRequesterView] = useState(false);
@@ -54,6 +57,7 @@ const FoodDonationApp = () => {
 // Donor Food Registration Form
 const DonorForm = ({ toggleView }) => {
   const [formData, setFormData] = useState({
+    donorType: '',
     organizationName: '',
     foodType: '',
     quantity: '',
@@ -65,6 +69,8 @@ const DonorForm = ({ toggleView }) => {
   });
 
   const [previewImage, setPreviewImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,6 +80,7 @@ const DonorForm = ({ toggleView }) => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
@@ -82,10 +89,49 @@ const DonorForm = ({ toggleView }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Donor form submitted:', formData);
-    // Handle form submission
+    setIsSubmitting(true);
+    
+    try {
+      const formDataToSend = new FormData();
+      
+      // Append all form data
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
+      
+      if (imageFile) {
+        formDataToSend.append('foodImage', imageFile);
+      }
+      
+      await axios.post(`${API_BASE_URL}/donations`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      // Reset form after successful submission
+      setFormData({
+        organizationName: '',
+        foodType: '',
+        quantity: '',
+        pickupTime: '',
+        pickupLocation: '',
+        expiryDate: '',
+        foodCategory: 'vegetarian',
+        additionalNotes: ''
+      });
+      setPreviewImage(null);
+      setImageFile(null);
+      
+      alert('Donation submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting donation:', error);
+      alert('Failed to submit donation. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -96,121 +142,160 @@ const DonorForm = ({ toggleView }) => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="input-group">
-          <label>Organization/Individual Name</label>
-          <input
-            type="text"
-            name="organizationName"
-            value={formData.organizationName}
-            onChange={handleChange}
-            placeholder="Enter your name or organization"
-            required
-          />
-        </div>
+  {/* Radio button group */}
+  <div className="input-group">
+    <label>You are donating as:</label>
+    <div className="radio-group" style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <input
+          type="radio"
+          name="donorType"
+          value="individual"
+          checked={formData.donorType === 'individual'}
+          onChange={handleChange}
+        />
+        Individual
+      </label>
+      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <input
+          type="radio"
+          name="donorType"
+          value="organization"
+          checked={formData.donorType === 'organization'}
+          onChange={handleChange}
+        />
+        Organization
+      </label>
+    </div>
+  </div>
 
-        <div className="input-row">
-          <div className="input-group">
-            <label>Food Type</label>
-            <input
-              type="text"
-              name="foodType"
-              value={formData.foodType}
-              onChange={handleChange}
-              placeholder="e.g., Fresh vegetables, Packaged meals"
-              required
-            />
-          </div>
+  {/* Name/Organization Field - THIS WAS MISSING */}
+  <div className="input-group">
+    <label>
+      {formData.donorType === 'individual' ? 'Your Name' : 'Organization Name'}
+    </label>
+    <input
+      type="text"
+      name="organizationName"
+      value={formData.organizationName}
+      onChange={handleChange}
+      placeholder={
+        formData.donorType === 'individual' 
+          ? 'Enter your full name' 
+          : 'Enter organization name'
+      }
+      required
+    />
+  </div>
 
-          <div className="input-group">
-            <label>Quantity</label>
-            <input
-              type="text"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              placeholder="e.g., 5 kg, 10 servings"
-              required
-            />
-          </div>
-        </div>
+  {/* Rest of your existing form fields */}
+  <div className="input-row">
+    <div className="input-group">
+      <label>Food Type</label>
+      <input
+        type="text"
+        name="foodType"
+        value={formData.foodType}
+        onChange={handleChange}
+        placeholder="e.g., Fresh vegetables, Packaged meals"
+        required
+      />
+    </div>
 
-        <div className="input-row">
-          <div className="input-group">
-            <label>Pickup Time</label>
-            <input
-              type="datetime-local"
-              name="pickupTime"
-              value={formData.pickupTime}
-              onChange={handleChange}
-              required
-            />
-          </div>
+    <div className="input-group">
+      <label>Quantity</label>
+      <input
+        type="text"
+        name="quantity"
+        value={formData.quantity}
+        onChange={handleChange}
+        placeholder="e.g., 5 kg, 10 servings"
+        required
+      />
+    </div>
+  </div>
 
-          <div className="input-group">
-            <label>Expiry Date</label>
-            <input
-              type="date"
-              name="expiryDate"
-              value={formData.expiryDate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
+  <div className="input-row">
+    <div className="input-group">
+      <label>Pickup Time</label>
+      <input
+        type="datetime-local"
+        name="pickupTime"
+        value={formData.pickupTime}
+        onChange={handleChange}
+        required
+      />
+    </div>
 
-        <div className="input-group">
-          <label>Pickup Location</label>
-          <input
-            type="text"
-            name="pickupLocation"
-            value={formData.pickupLocation}
-            onChange={handleChange}
-            placeholder="Full address for pickup"
-            required
-          />
-        </div>
+    <div className="input-group">
+      <label>Expiry Date</label>
+      <input
+        type="date"
+        name="expiryDate"
+        value={formData.expiryDate}
+        onChange={handleChange}
+        required
+      />
+    </div>
+  </div>
 
-        <div className="input-row">
-          <div className="input-group">
-            <label>Food Category</label>
-            <select
-              name="foodCategory"
-              value={formData.foodCategory}
-              onChange={handleChange}
-            >
-              <option value="vegetarian">Vegetarian</option>
-              <option value="non-vegetarian">Non-Vegetarian</option>
-              <option value="vegan">Vegan</option>
-              <option value="gluten-free">Gluten Free</option>
-            </select>
-          </div>
+  <div className="input-group">
+    <label>Pickup Location</label>
+    <input
+      type="text"
+      name="pickupLocation"
+      value={formData.pickupLocation}
+      onChange={handleChange}
+      placeholder="Full address for pickup"
+      required
+    />
+  </div>
 
-          <div className="input-group">
-            <label>Upload Food Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="file-input"
-            />
-          </div>
-        </div>
+  <div className="input-row">
+    <div className="input-group">
+      <label>Food Category</label>
+      <select
+        name="foodCategory"
+        value={formData.foodCategory}
+        onChange={handleChange}
+      >
+        <option value="vegetarian">Vegetarian</option>
+        <option value="non-vegetarian">Non-Vegetarian</option>
+        <option value="vegan">Vegan</option>
+        <option value="gluten-free">Gluten Free</option>
+      </select>
+    </div>
 
-        <div className="input-group">
-          <label>Additional Notes</label>
-          <textarea
-            name="additionalNotes"
-            value={formData.additionalNotes}
-            onChange={handleChange}
-            placeholder="Any special instructions or details"
-            rows="3"
-          />
-        </div>
+    <div className="input-group">
+      <label>Upload Food Image</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="file-input"
+      />
+    </div>
+  </div>
 
-        <button type="submit" className="submit-button">
-          Register Donation
-        </button>
-      </form>
+  <div className="input-group">
+    <label>Additional Notes</label>
+    <textarea
+      name="additionalNotes"
+      value={formData.additionalNotes}
+      onChange={handleChange}
+      placeholder="Any special instructions or details"
+      rows="3"
+    />
+  </div>
+
+  <button 
+    type="submit" 
+    className="submit-button"
+    disabled={isSubmitting}
+  >
+    {isSubmitting ? 'Submitting...' : 'Register Donation'}
+  </button>
+</form>
     </div>
   );
 };
@@ -228,15 +313,39 @@ const RequesterForm = ({ toggleView }) => {
     additionalMessage: ''
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Requester form submitted:', formData);
-    // Handle form submission
+    setIsSubmitting(true);
+    
+    try {
+      await axios.post(`${API_BASE_URL}/requests`, formData);
+      
+      // Reset form after successful submission
+      setFormData({
+        fullName: '',
+        address: '',
+        phoneNumber: '',
+        email: '',
+        foodType: '',
+        quantity: '',
+        foodCategory: 'vegetarian',
+        additionalMessage: ''
+      });
+      
+      alert('Request submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting request:', error);
+      alert('Failed to submit request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -349,8 +458,12 @@ const RequesterForm = ({ toggleView }) => {
           />
         </div>
 
-        <button type="submit" className="submit-button">
-          Submit Request
+        <button 
+          type="submit" 
+          className="submit-button"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Submitting...' : 'Submit Request'}
         </button>
       </form>
     </div>
