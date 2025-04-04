@@ -5,16 +5,19 @@ import {
   FaComments, FaChartLine, FaHeart, FaUsers,
   FaMapMarkerAlt, FaClock, FaPhoneAlt, FaEnvelope,
   FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn,
-  FaSearch, FaCamera, FaExchangeAlt, FaChartPie
+  FaSearch, FaCamera, FaExchangeAlt, FaChartPie,
+  FaTrophy, FaSeedling, FaRecycle, FaTree
 } from 'react-icons/fa';
-import { GiFoodTruck, GiMeal } from 'react-icons/gi';
-import { MdDeliveryDining, MdFoodBank } from 'react-icons/md';
+import { GiFoodTruck, GiMeal, GiEarthAmerica } from 'react-icons/gi';
+import { MdDeliveryDining, MdFoodBank, MdEco } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 function App() {
   const [scrolled, setScrolled] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [userPoints, setUserPoints] = useState(0);
+  const [userLevel, setUserLevel] = useState(1);
   const controls = useAnimation();
   const navigate = useNavigate();
 
@@ -51,6 +54,18 @@ function App() {
       </motion.button>
     );
   };
+
+  // Simulate adding points (would come from backend in real app)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setUserPoints(prev => {
+        const newPoints = prev + Math.floor(Math.random() * 10);
+        setUserLevel(Math.floor(newPoints / 100) + 1)
+        return newPoints;
+      });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -177,9 +192,43 @@ function App() {
     }
   ];
 
+  const educationCards = [
+    {
+      title: "Food Waste Facts",
+      content: "1/3 of all food produced globally is wasted. That's 1.3 billion tons annually!",
+      icon: <MdEco />,
+      color: "#8BC34A"
+    },
+    {
+      title: "Environmental Impact",
+      content: "Food waste accounts for 8% of global greenhouse gas emissions.",
+      icon: <GiEarthAmerica />,
+      color: "#4CAF50"
+    },
+    {
+      title: "Hunger Paradox",
+      content: "While we waste food, 690 million people go hungry every night.",
+      icon: <FaUtensils />,
+      color: "#CDDC39"
+    },
+    {
+      title: "Your Impact",
+      content: "Each donation saves an average of 2.5kg CO2 emissions.",
+      icon: <FaLeaf />,
+      color: "#2E7D32"
+    }
+  ];
+
+  const gamificationBadges = [
+    { name: "Seed Saver", icon: <FaSeedling />, points: 50 },
+    { name: "Food Hero", icon: <FaTrophy />, points: 100 },
+    { name: "Eco Warrior", icon: <FaRecycle />, points: 200 },
+    { name: "Planet Protector", icon: <FaTree />, points: 500 }
+  ];
+
   return (
     <div className="app">
-      {/* Header */}
+      {/* Header with Points Display */}
       <header className={`header ${scrolled ? 'scrolled' : ''}`}>
         <motion.div 
           initial={{ x: -100, opacity: 0 }}
@@ -219,21 +268,33 @@ function App() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <a href="#testimonials">Testimonials</a>
+              <a href="#gamification">Eco Rewards</a>
             </motion.li>
             <motion.li 
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
             >
+              <a href="#education">Learn</a>
+            </motion.li>
+            <motion.li 
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+            >
               <a href="#contact">Contact</a>
             </motion.li>
           </ul>
         </nav>
         
-        <MagneticButton className="cta-button" to="/join">
-          Join Now
-        </MagneticButton>
+        <div className="user-points">
+          <span className="points-badge">
+            <FaLeaf /> {userPoints} pts
+          </span>
+          <MagneticButton className="cta-button" to="/dashboard">
+            My Dashboard
+          </MagneticButton>
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -244,15 +305,16 @@ function App() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Bridging <span>Excess Food</span> and <span>Need</span>
+            Turn <span>Food Waste</span> into <span>Community Strength</span>
           </motion.h1>
           
           <motion.p
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
+            className="hero-subtitle"
           >
-            ZeroWasteBites connects food donors with those in need, reducing food waste and fighting hunger in your community.
+            Every donation you make fights hunger AND climate change. Join our movement to create a sustainable food ecosystem.
           </motion.p>
           
           <motion.div 
@@ -261,8 +323,28 @@ function App() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <MagneticButton className="cta-button pulse" to="/donate">Donate Food</MagneticButton>
-            <MagneticButton className="secondary-button" to="/request">Request Food</MagneticButton>
+            <MagneticButton className="cta-button pulse" to="/join">
+              <FaLeaf /> Donate Food
+            </MagneticButton>
+            <MagneticButton className="secondary-button" to="/join">
+              <FaHandsHelping /> Request Food
+            </MagneticButton>
+          </motion.div>
+
+          <motion.div 
+            className="impact-counter"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            <div className="counter-item">
+              <span className="counter-number">1,245</span>
+              <span className="counter-label">Meals Saved Today</span>
+            </div>
+            <div className="counter-item">
+              <span className="counter-number">3.2T</span>
+              <span className="counter-label">CO2 Prevented</span>
+            </div>
           </motion.div>
         </div>
         
@@ -289,6 +371,25 @@ function App() {
                 }}
               />
             ))}
+          </div>
+          <div className="hero-illustration">
+            <GiFoodTruck className="truck-icon" />
+            <div className="food-bubbles">
+              {['🍎', '🥖', '🥦', '🍗', '🧀'].map((emoji, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ y: 0 }}
+                  animate={{ y: [0, -15, 0] }}
+                  transition={{
+                    duration: 3 + i,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  {emoji}
+                </motion.span>
+              ))}
+            </div>
           </div>
         </motion.div>
       </section>
@@ -390,6 +491,124 @@ function App() {
         </div>
       </section>
 
+      {/* Gamification Section */}
+      <section id="gamification" className="gamification-section">
+        <motion.div 
+          className="section-header center-header"
+          initial={{ y: 50, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <h2><FaTrophy /> Eco Rewards Program</h2>
+          <p>Earn points and badges for your sustainable actions</p>
+        </motion.div>
+        
+        <div className="gamification-container">
+          <div className="progress-tracker">
+            <div className="level-indicator">
+              <div className="level-circle">Level {userLevel}</div>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${(userPoints % 100)}%` }}
+                ></div>
+              </div>
+              <div className="points-display">{userPoints} pts</div>
+            </div>
+            
+            <div className="next-reward">
+              <h4>Next Reward at {Math.ceil(userPoints/100)*100} points:</h4>
+              <div className="reward-card">
+                <FaSeedling className="reward-icon" />
+                <span>Exclusive Eco-Badge</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="badges-container">
+            <h3>Available Badges</h3>
+            <div className="badges-grid">
+              {gamificationBadges.map((badge, index) => (
+                <div 
+                  key={index} 
+                  className={`badge-card ${userPoints >= badge.points ? 'unlocked' : 'locked'}`}
+                >
+                  <div className="badge-icon">
+                    {badge.icon}
+                    {userPoints < badge.points && <div className="lock-icon">🔒</div>}
+                  </div>
+                  <h4>{badge.name}</h4>
+                  <p>{badge.points} points</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Education Section */}
+      <section id="education" className="education-section">
+        <motion.div 
+          className="section-header center-header"
+          initial={{ y: 50, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <h2><FaLeaf /> Food Waste Education</h2>
+          <p>Learn how your actions make a difference</p>
+        </motion.div>
+        
+        <div className="education-cards">
+          {educationCards.map((card, index) => (
+            <motion.div
+              key={index}
+              className="education-card"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              style={{ backgroundColor: card.color }}
+            >
+              <div className="card-icon">{card.icon}</div>
+              <h3>{card.title}</h3>
+              <p>{card.content}</p>
+              <button className="learn-more">Learn More</button>
+            </motion.div>
+          ))}
+        </div>
+        
+        <div className="impact-calculator">
+          <h3>Calculate Your Impact</h3>
+          <div className="calculator-form">
+            <div className="form-group">
+              <label>Number of Donations:</label>
+              <input type="number" min="1" defaultValue="1" />
+            </div>
+            <div className="form-group">
+              <label>Average Quantity per Donation (kg):</label>
+              <input type="number" min="1" defaultValue="5" />
+            </div>
+            <button className="calculate-button">Calculate Impact</button>
+          </div>
+          <div className="calculator-results">
+            <div className="result-item">
+              <span className="result-value">~25</span>
+              <span className="result-label">Meals Provided</span>
+            </div>
+            <div className="result-item">
+              <span className="result-value">~12.5</span>
+              <span className="result-label">kg CO2 Saved</span>
+            </div>
+            <div className="result-item">
+              <span className="result-value">~625</span>
+              <span className="result-label">Liters Water Saved</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section id="testimonials" className="testimonials-section">
         <motion.div 
@@ -446,8 +665,12 @@ function App() {
           <h2>Ready to Make a Difference?</h2>
           <p>Join hundreds of others reducing food waste in your community</p>
           <div className="cta-buttons">
-            <MagneticButton className="cta-button white-button pulse" to="/join">Sign Up Now</MagneticButton>
-            <MagneticButton className="secondary-button white-outline" to="/about">Learn More</MagneticButton>
+            <MagneticButton className="cta-button white-button pulse" to="/Requester">
+              Sign Up Now
+            </MagneticButton>
+            <MagneticButton className="secondary-button white-outline" to="/how-it-works">
+              Learn More
+            </MagneticButton>
           </div>
         </motion.div>
       </section>
@@ -541,7 +764,8 @@ function App() {
                 <li><a href="#home">Home</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#features">Features</a></li>
-                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#gamification">Eco Rewards</a></li>
+                <li><a href="#education">Learn</a></li>
                 <li><a href="#contact">Contact</a></li>
               </ul>
             </div>
@@ -553,6 +777,7 @@ function App() {
                 <li><a href="#">FAQ</a></li>
                 <li><a href="#">Food Safety</a></li>
                 <li><a href="#">Partners</a></li>
+                <li><a href="#">Impact Reports</a></li>
               </ul>
             </div>
             
@@ -568,6 +793,9 @@ function App() {
           
           <div className="footer-bottom">
             <p>&copy; {new Date().getFullYear()} ZeroWasteBites. All rights reserved.</p>
+            <p className="sustainability-statement">
+              <FaLeaf /> Proudly carbon neutral since 2023
+            </p>
           </div>
         </div>
       </footer>
