@@ -1,7 +1,7 @@
 /* Main Container */
 .app-container {
     display: flex;
-    height: 100vh;
+    height: 110vh;
     width: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
@@ -25,7 +25,7 @@
   
   .form-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
   
   .form-header h1 {
@@ -39,7 +39,7 @@
     font-size: 1rem;
   }
   
-  /* Input Styles */
+  
   .input-group {
     margin-bottom: 1.5rem;
   }
