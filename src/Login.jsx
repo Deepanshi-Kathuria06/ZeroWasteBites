@@ -15,7 +15,7 @@ export default function Login() {
 
   // Store in localStorage (simulate auth)
   localStorage.setItem("userRole", userRole);
-
+localStorage.setItem("user", JSON.stringify(fakeUser));
   // Navigate based on role
   if (userRole === "NGO") {
     navigate("/ngo/dashboard");
